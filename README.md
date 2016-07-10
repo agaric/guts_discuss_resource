@@ -11,4 +11,4 @@ Install per normal https://www.drupal.org/documentation/install/modules-themes/m
 ### Credits
 
 Initial development and maintenance by [Agaric](http://agaric.com/) on behalf of
-Teachers with GUTS (Growing Up Thinking Scientifically), http://.
+[Teachers with GUTS (Growing Up Thinking Scientifically)](http://teacherswithguts.org/).
