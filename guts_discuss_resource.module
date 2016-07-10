@@ -1,0 +1,46 @@
+<?php
+
+/**
+ * @file
+ * Automatically creates a forum post referencing a resource when a resource is
+ * created.
+ */
+
+use Drupal\Core\Routing\RouteMatchInterface;
+use Drupal\node\Entity\Node;
+
+/**
+ * Implements hook_ENTITY_TYPE_create().
+ *
+ * @param \Drupal\Core\Entity\EntityInterface $entity
+ */
+function guts_discuss_resource_node_insert(\Drupal\Core\Entity\EntityInterface $entity) {
+  $label = $entity->label();
+  $id = $entity->id();
+  if ($entity->bundle() == 'resources' && $entity->id()) {
+    $node = Node::create(array(
+      'nid' => NULL,
+      'type' => 'forum',
+      'title' => $entity->label(),
+      'uid' => $entity->getOwnerId(),
+      'status' => NODE_PUBLISHED,
+    ));
+    $node->save();
+  }
+}
+
+/**
+ * Implements hook_help().
+ */
+function guts_discuss_resource_help($route_name, RouteMatchInterface $route_match) {
+  switch ($route_name) {
+    case 'help.page.guts_discuss_resource':
+      $output = '';
+      $output .= '<h3>' . t('About') . '</h3>';
+      $output .= '<p>' . t('Automatically creates a forum post referencing a resource when a resource is created.') . '</p>';
+      return $output;
+
+    default:
+  }
+}
+

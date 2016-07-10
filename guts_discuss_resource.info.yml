@@ -1,0 +1,8 @@
+name: GUTS discuss resource
+type: module
+description: Automatically create a forum post referencing a resource when a resource is created.
+core: 8.x
+package: GUTS
+
+dependencies:
+  - node
