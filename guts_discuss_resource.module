@@ -15,9 +15,7 @@ use Drupal\node\Entity\Node;
  * @param \Drupal\Core\Entity\EntityInterface $entity
  */
 function guts_discuss_resource_node_insert(\Drupal\Core\Entity\EntityInterface $entity) {
-  $label = $entity->label();
-  $id = $entity->id();
-  if ($entity->bundle() == 'resources' && $entity->id()) {
+  if ($entity->bundle() == 'resource' && $entity->id()) {
     $node = Node::create(array(
       'nid' => NULL,
       'type' => 'forum',
