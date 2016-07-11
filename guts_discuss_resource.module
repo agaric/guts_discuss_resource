@@ -21,6 +21,7 @@ function guts_discuss_resource_node_insert(\Drupal\Core\Entity\EntityInterface $
       'type' => 'forum',
       'title' => $entity->label(),
       'uid' => $entity->getOwnerId(),
+      'field_resource' => ['target_id' => $entity->id()],
       'status' => NODE_PUBLISHED,
     ));
     $node->save();
