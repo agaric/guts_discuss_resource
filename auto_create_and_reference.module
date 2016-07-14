@@ -1,0 +1,74 @@
+<?php
+
+/**
+ * @file
+ * Automatically creates a forum post referencing a resource when a resource is
+ * created.
+ */
+
+use Drupal\Core\Routing\RouteMatchInterface;
+use Drupal\node\Entity\Node;
+
+/**
+ * Implements hook_entity_insert().
+ *
+ * @param \Drupal\Core\Entity\EntityInterface $entity
+ */
+function auto_create_and_reference_entity_insert(\Drupal\Core\Entity\EntityInterface $entity) {
+  $entity_pairs = [
+    [
+      'trigger_entity_type' => 'node',
+      'trigger_entity_bundle' => 'resource',
+      'create_entity_type' => 'node',
+      'create_entity_bundle' => 'forum',
+      'create_entity_reference_field' => 'field_resource',
+    ],
+    [
+      'trigger_entity_type' => 'user',
+      'trigger_entity_bundle' => 'user',
+      'create_entity_type' => 'node',
+      'create_entity_bundle' => 'person',
+      'create_entity_reference_field' => 'field_person',
+    ],
+  ];
+  // $entity>getEntityTypeId(); is inexplicably failing.
+  $entity_type = $entity->getEntityType()->id();
+  foreach ($entity_pairs as $entity_pair) {
+    if (
+      $entity_type == $entity_pair['trigger_entity_type']
+      && $entity->bundle() == $entity_pair['trigger_entity_bundle']
+    ) {
+      if ($entity_type == 'user') {
+        $uid = $entity->id();
+      }
+      else {
+        $uid = method_exists($entity, 'getOwnerId') ? $entity->getOwnerId() : \Drupal::currentUser();
+      }
+      $created_entity = Node::create(array(
+        'nid' => NULL,
+        'type' => $entity_pair['create_entity_bundle'],
+        'title' => $entity->label(),
+        'uid' => $uid,
+        $entity_pair['create_entity_reference_field'] => ['target_id' => $entity->id()],
+        'status' => NODE_PUBLISHED,
+      ));
+      $created_entity->save();
+    }
+  }
+}
+
+/**
+ * Implements hook_help().
+ */
+function auto_create_and_reference_help($route_name, RouteMatchInterface $route_match) {
+  switch ($route_name) {
+    case 'help.page.auto_create_and_reference':
+      $output = '';
+      $output .= '<h3>' . t('About') . '</h3>';
+      $output .= '<p>' . t('Automatically creates an entity referencing another entity when the first entity is created.') . '</p>';
+      return $output;
+
+    default:
+  }
+}
+
