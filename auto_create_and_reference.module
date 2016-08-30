@@ -12,6 +12,8 @@ use Drupal\node\Entity\Node;
 /**
  * Implements hook_entity_insert().
  *
+ * Create forum topic in "Contributed Resources" forum when resource is posted.
+ *
  * @param \Drupal\Core\Entity\EntityInterface $entity
  */
 function auto_create_and_reference_entity_insert(\Drupal\Core\Entity\EntityInterface $entity) {
@@ -22,15 +24,10 @@ function auto_create_and_reference_entity_insert(\Drupal\Core\Entity\EntityInter
       'create_entity_type' => 'node',
       'create_entity_bundle' => 'forum',
       'create_entity_reference_field' => 'field_resource',
-    ],
-    [
-      'trigger_entity_type' => 'user',
-      'trigger_entity_bundle' => 'user',
-      'create_entity_type' => 'node',
-      'create_entity_bundle' => 'person',
-      'create_entity_reference_field' => 'field_person',
-    ],
+    ]
   ];
+  $terms = taxonomy_term_load_multiple_by_name('Contributed Resources', 'forums');
+  $contrib_resources_forum = array_pop($terms);
   // $entity>getEntityTypeId(); is inexplicably failing.
   $entity_type = $entity->getEntityType()->id();
   foreach ($entity_pairs as $entity_pair) {
@@ -51,6 +48,7 @@ function auto_create_and_reference_entity_insert(\Drupal\Core\Entity\EntityInter
         'uid' => $uid,
         $entity_pair['create_entity_reference_field'] => ['target_id' => $entity->id()],
         'status' => NODE_PUBLISHED,
+        'taxonomy_forums' => ['target_id' => $contrib_resources_forum->id()],
       ));
       $created_entity->save();
     }
